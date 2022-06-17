@@ -28,6 +28,8 @@ import (
 const (
 	digest1 = "sha256:05f95b26ed10668b7183c1e2da98610e91372fa9f510046d4ce5812addad86b5"
 	digest2 = "sha256:05f95b26ed10668b7183c1e2da98610e91372fa9f510046d4ce5812addad86b6"
+	digest3 = "sha256:05f95b26ed10668b7183c1e2da98610e91372fa9f510046d4ce5812addad86b7"
+	digest4 = "sha256:05f95b26ed10668b7183c1e2da98610e91372fa9f510046d4ce5812addad86b8"
 )
 
 var ignore = []cmp.Option{cmpopts.IgnoreUnexported(name.Registry{}, name.Repository{}, name.Digest{})}
@@ -71,7 +73,7 @@ func TestOCIArtifact_ExtractObjects(t *testing.T) {
 					},
 				},
 			},
-			want: []interface{}{digest(t, "gcr.io/foo/bar@sha256:05f95b26ed10668b7183c1e2da98610e91372fa9f510046d4ce5812addad86b5")},
+			want: []interface{}{createDigest(t, "gcr.io/foo/bar@sha256:05f95b26ed10668b7183c1e2da98610e91372fa9f510046d4ce5812addad86b5")},
 		},
 		{
 			name: "two images",
@@ -122,8 +124,8 @@ func TestOCIArtifact_ExtractObjects(t *testing.T) {
 				},
 			},
 			want: []interface{}{
-				digest(t, "gcr.io/foo/bar@sha256:05f95b26ed10668b7183c1e2da98610e91372fa9f510046d4ce5812addad86b5"),
-				digest(t, "gcr.io/foo/baz@sha256:05f95b26ed10668b7183c1e2da98610e91372fa9f510046d4ce5812addad86b6"),
+				createDigest(t, "gcr.io/foo/bar@sha256:05f95b26ed10668b7183c1e2da98610e91372fa9f510046d4ce5812addad86b5"),
+				createDigest(t, "gcr.io/foo/baz@sha256:05f95b26ed10668b7183c1e2da98610e91372fa9f510046d4ce5812addad86b6"),
 			},
 		},
 		{
@@ -177,8 +179,8 @@ func TestOCIArtifact_ExtractObjects(t *testing.T) {
 				},
 			},
 			want: []interface{}{
-				digest(t, "gcr.io/foo/bat@sha256:05f95b26ed10668b7183c1e2da98610e91372fa9f510046d4ce5812addad86b4"),
-				digest(t, "gcr.io/foo/bar@sha256:05f95b26ed10668b7183c1e2da98610e91372fa9f510046d4ce5812addad86b5")},
+				createDigest(t, "gcr.io/foo/bat@sha256:05f95b26ed10668b7183c1e2da98610e91372fa9f510046d4ce5812addad86b4"),
+				createDigest(t, "gcr.io/foo/bar@sha256:05f95b26ed10668b7183c1e2da98610e91372fa9f510046d4ce5812addad86b5")},
 		},
 		{
 			name: "extra",
@@ -232,7 +234,7 @@ func TestOCIArtifact_ExtractObjects(t *testing.T) {
 					},
 				},
 			},
-			want: []interface{}{digest(t, "gcr.io/foo/bar@sha256:05f95b26ed10668b7183c1e2da98610e91372fa9f510046d4ce5812addad86b5")},
+			want: []interface{}{createDigest(t, "gcr.io/foo/bar@sha256:05f95b26ed10668b7183c1e2da98610e91372fa9f510046d4ce5812addad86b5")},
 		}, {
 			name: "images",
 			tr: &v1beta1.TaskRun{
@@ -248,8 +250,8 @@ func TestOCIArtifact_ExtractObjects(t *testing.T) {
 				},
 			},
 			want: []interface{}{
-				digest(t, "gcr.io/foo/bar@sha256:05f95b26ed10668b7183c1e2da98610e91372fa9f510046d4ce5812addad86b5"),
-				digest(t, "gcr.io/baz/bar@sha256:05f95b26ed10668b7183c1e2da98610e91372fa9f510046d4ce5812addad86b6"),
+				createDigest(t, "gcr.io/foo/bar@sha256:05f95b26ed10668b7183c1e2da98610e91372fa9f510046d4ce5812addad86b5"),
+				createDigest(t, "gcr.io/baz/bar@sha256:05f95b26ed10668b7183c1e2da98610e91372fa9f510046d4ce5812addad86b6"),
 			},
 		}, {
 			name: "images-newline",
@@ -266,8 +268,8 @@ func TestOCIArtifact_ExtractObjects(t *testing.T) {
 				},
 			},
 			want: []interface{}{
-				digest(t, "gcr.io/foo/bar@sha256:05f95b26ed10668b7183c1e2da98610e91372fa9f510046d4ce5812addad86b5"),
-				digest(t, "gcr.io/baz/bar@sha256:05f95b26ed10668b7183c1e2da98610e91372fa9f510046d4ce5812addad86b6"),
+				createDigest(t, "gcr.io/foo/bar@sha256:05f95b26ed10668b7183c1e2da98610e91372fa9f510046d4ce5812addad86b5"),
+				createDigest(t, "gcr.io/baz/bar@sha256:05f95b26ed10668b7183c1e2da98610e91372fa9f510046d4ce5812addad86b6"),
 			},
 		},
 	}
@@ -301,14 +303,16 @@ func TestExtractOCIImagesFromResults(t *testing.T) {
 					{Name: "img2_IMAGE_DIGEST", Value: *v1beta1.NewArrayOrString(digest2)},
 					{Name: "IMAGE_URL", Value: *v1beta1.NewArrayOrString("img3")},
 					{Name: "IMAGE_DIGEST", Value: *v1beta1.NewArrayOrString(digest1)},
+					{Name: "img4_IMAGE_URL", Value: *v1beta1.NewArrayOrString("img4")},
+					{Name: "img5_IMAGE_DIGEST", Value: *v1beta1.NewArrayOrString("sha123:abc")},
 				},
 			},
 		},
 	}
 	want := []interface{}{
-		digest(t, fmt.Sprintf("img1@%s", digest1)),
-		digest(t, fmt.Sprintf("img2@%s", digest2)),
-		digest(t, fmt.Sprintf("img3@%s", digest1)),
+		createDigest(t, fmt.Sprintf("img1@%s", digest1)),
+		createDigest(t, fmt.Sprintf("img2@%s", digest2)),
+		createDigest(t, fmt.Sprintf("img3@%s", digest1)),
 	}
 	got := ExtractOCIImagesFromResults(tr, logtesting.TestLogger(t))
 	sort.Slice(got, func(i, j int) bool {
@@ -317,11 +321,52 @@ func TestExtractOCIImagesFromResults(t *testing.T) {
 		return a.String() < b.String()
 	})
 	if !cmp.Equal(got, want, ignore...) {
-		t.Fatalf("not the same %s", cmp.Diff(got, want, ignore...))
+		t.Fatalf("not the same %s", cmp.Diff(want, got, ignore...))
 	}
 }
 
-func digest(t *testing.T, dgst string) name.Digest {
+func TestExtractSignableTargetFromResults(t *testing.T) {
+	tr := &v1beta1.TaskRun{
+		Status: v1beta1.TaskRunStatus{
+			TaskRunStatusFields: v1beta1.TaskRunStatusFields{
+				TaskRunResults: []v1beta1.TaskRunResult{
+					{Name: "mvn1_ARTIFACT_URI", Value: *v1beta1.NewArrayOrString("projects/test-project/locations/us-west4/repositories/test-repo/mavenArtifacts/com.google.guava:guava:31.0-jre")},
+					{Name: "mvn1_ARTIFACT_DIGEST", Value: *v1beta1.NewArrayOrString(digest1)},
+					{Name: "mvn1_pom_ARTIFACT_URI", Value: *v1beta1.NewArrayOrString("com.google.guava:guava:31.0-jre.pom")},
+					{Name: "mvn1_pom_ARTIFACT_DIGEST", Value: *v1beta1.NewArrayOrString(digest2)},
+					{Name: "mvn1_src_ARTIFACT_URI", Value: *v1beta1.NewArrayOrString("com.google.guava:guava:31.0-jre-sources.jar")},
+					{Name: "mvn1_src_ARTIFACT_DIGEST", Value: *v1beta1.NewArrayOrString(digest3)},
+					{Name: "mvn2_ARTIFACT_URI", Value: *v1beta1.NewArrayOrString("projects/test-project/locations/us-west4/repositories/test-repo/mavenArtifacts/a.b.c:d:1.0-jre")},
+					{Name: "mvn2_ARTIFACT_DIGEST", Value: *v1beta1.NewArrayOrString(digest4)},
+					{Name: "ARTIFACT_URI", Value: *v1beta1.NewArrayOrString("projects/test-project/locations/us-west4/repositories/test-repo/mavenArtifacts/empty_prefix")},
+					{Name: "ARTIFACT_DIGEST", Value: *v1beta1.NewArrayOrString(digest1)},
+					{Name: "miss_target_name_ARTIFACT_DIGEST", Value: *v1beta1.NewArrayOrString(digest1)},
+					{Name: "wrong_digest_format_ARTIFACT_URI", Value: *v1beta1.NewArrayOrString("projects/test-project/locations/us-west4/repositories/test-repo/mavenArtifacts/wrong_digest_format")},
+					{Name: "wrong_digest_format_ARTIFACT_DIGEST", Value: *v1beta1.NewArrayOrString("abc")},
+				},
+			},
+		},
+	}
+	want := []*StructuredSignable{
+		{URI: "projects/test-project/locations/us-west4/repositories/test-repo/mavenArtifacts/com.google.guava:guava:31.0-jre", Digest: digest1},
+		{URI: "com.google.guava:guava:31.0-jre.pom", Digest: digest2},
+		{URI: "com.google.guava:guava:31.0-jre-sources.jar", Digest: digest3},
+		{URI: "projects/test-project/locations/us-west4/repositories/test-repo/mavenArtifacts/a.b.c:d:1.0-jre", Digest: digest4},
+		{URI: "projects/test-project/locations/us-west4/repositories/test-repo/mavenArtifacts/empty_prefix", Digest: digest1},
+	}
+	got := ExtractSignableTargetFromResults(tr, logtesting.TestLogger(t))
+	sort.Slice(got, func(i, j int) bool {
+		return got[i].URI < got[j].URI
+	})
+	sort.Slice(want, func(i, j int) bool {
+		return want[i].URI < want[j].URI
+	})
+	if !cmp.Equal(got, want, ignore...) {
+		t.Fatalf("not the same %s", cmp.Diff(want, got, ignore...))
+	}
+}
+
+func createDigest(t *testing.T, dgst string) name.Digest {
 	result, err := name.NewDigest(dgst)
 	if err != nil {
 		t.Fatal(err)

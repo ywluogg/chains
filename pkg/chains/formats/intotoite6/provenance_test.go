@@ -36,6 +36,9 @@ import (
 const (
 	digest1 = "sha256:05f95b26ed10668b7183c1e2da98610e91372fa9f510046d4ce5812addad86b5"
 	digest2 = "sha256:05f95b26ed10668b7183c1e2da98610e91372fa9f510046d4ce5812addad86b6"
+	digest3 = "sha256:05f95b26ed10668b7183c1e2da98610e91372fa9f510046d4ce5812addad86b7"
+	digest4 = "sha256:05f95b26ed10668b7183c1e2da98610e91372fa9f510046d4ce5812addad86b8"
+	digest5 = "sha256:05f95b26ed10668b7183c1e2da98610e91372fa9f510046d4ce5812addad86b9"
 )
 
 func TestMetadata(t *testing.T) {
@@ -290,6 +293,34 @@ func TestGetSubjectDigests(t *testing.T) {
 						Name:  "IMAGE_DIGEST",
 						Value: *v1beta1.NewArrayOrString(digest1),
 					},
+					{
+						Name:  "mvn1_ARTIFACT_URI",
+						Value: *v1beta1.NewArrayOrString("maven-test-0.1.1.jar"),
+					},
+					{
+						Name:  "mvn1_ARTIFACT_DIGEST",
+						Value: *v1beta1.NewArrayOrString(digest3),
+					},
+					{
+						Name:  "mvn1_pom_ARTIFACT_URI",
+						Value: *v1beta1.NewArrayOrString("maven-test-0.1.1.pom"),
+					},
+					{
+						Name:  "mvn1_pom_ARTIFACT_DIGEST",
+						Value: *v1beta1.NewArrayOrString(digest4),
+					},
+					{
+						Name:  "mvn1_src_ARTIFACT_URI",
+						Value: *v1beta1.NewArrayOrString("maven-test-0.1.1-sources.jar"),
+					},
+					{
+						Name:  "mvn1_src_ARTIFACT_DIGEST",
+						Value: *v1beta1.NewArrayOrString(digest5),
+					},
+					{
+						Name:  "invalid_ARTIFACT_DIGEST",
+						Value: *v1beta1.NewArrayOrString(digest5),
+					},
 				},
 				ResourcesResult: []v1beta1.PipelineResourceResult{
 					{
@@ -311,6 +342,21 @@ func TestGetSubjectDigests(t *testing.T) {
 			Name: "index.docker.io/registry/myimage",
 			Digest: slsa.DigestSet{
 				"sha256": strings.TrimPrefix(digest1, "sha256:"),
+			},
+		}, {
+			Name: "maven-test-0.1.1-sources.jar",
+			Digest: slsa.DigestSet{
+				"sha256": strings.TrimPrefix(digest5, "sha256:"),
+			},
+		}, {
+			Name: "maven-test-0.1.1.jar",
+			Digest: slsa.DigestSet{
+				"sha256": strings.TrimPrefix(digest3, "sha256:"),
+			},
+		}, {
+			Name: "maven-test-0.1.1.pom",
+			Digest: slsa.DigestSet{
+				"sha256": strings.TrimPrefix(digest4, "sha256:"),
 			},
 		}, {
 			Name: "registry/resource-image",
